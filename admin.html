@@ -8,302 +8,181 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        /* 暗黑主題風格 */
-        body { background-color: #1e1e2d; color: #f0f0f0; font-family: sans-serif; padding-bottom: 80px; }
+        body { background-color: #1a1c29; color: #e0e0e0; font-family: -apple-system, sans-serif; padding-bottom: 80px; }
         
-        /* 底部導航列 */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #2b2b40; border-top: 1px solid #444; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
-        .nav-btn { background: none; border: none; color: #888; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; }
+        /* Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #2f314a; border-top: 1px solid #444; z-index: 1000; display: flex; justify-content: space-around; padding: 10px 0; }
+        .nav-btn { background: none; border: none; color: #aaa; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; }
         .nav-btn.active { color: #ddae4e; font-weight: bold; }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 3px; }
-
-        /* 頁面切換 */
+        .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        
+        /* Page */
         .page-section { display: none; padding: 15px; animation: fadeIn 0.3s; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-        /* 卡片樣式 */
-        .card-dark { background: #2b2b40; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #3e3e5e; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .card-title-custom { color: #ddae4e; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-
-        /* 價格設定行 */
-        .item-row { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; background: #363652; padding: 8px; border-radius: 8px; }
-        .form-dark { background: #1e1e2d; border: 1px solid #555; color: white; font-size: 0.9rem; }
-        .form-dark:focus { background: #252535; color: white; border-color: #ddae4e; }
-        .badge-discount { background: #ffc107; color: #000; font-size: 0.7rem; padding: 2px 4px; border-radius: 4px; }
-
-        /* 日曆樣式 */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .cal-cell { aspect-ratio: 1; background: #2b2b40; border: 1px solid #3e3e5e; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; }
-        .cal-cell.has-pending { border-color: #dc3545; background: #3a2a2a; }
-        .pending-badge { position: absolute; top: 2px; right: 2px; background: #dc3545; color: white; font-size: 0.6rem; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         
-        /* 訂單卡片 */
-        .order-card { border-left: 4px solid #ddae4e; background: #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; }
+        /* Cards */
+        .card-dark { background: #2f314a; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #444; }
+        .section-title { color: #ddae4e; border-bottom: 1px solid #555; padding-bottom: 8px; margin-bottom: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; color: #ddae4e; }
+        /* Calendar */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-cell { 
+            background: #2f314a; border: 1px solid #444; min-height: 70px; border-radius: 5px; 
+            position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding-top: 4px;
+        }
+        .cal-cell.today { border-color: #ddae4e; }
+        .cal-date-num { font-weight: bold; margin-bottom: 2px; }
+        .region-tag { font-size: 0.6rem; line-height: 1.1; text-align: center; color: #fff; background: #dc3545; border-radius: 4px; padding: 2px; margin-top: 2px; width: 90%; }
+        
+        /* Pending List */
+        .order-group { border-left: 4px solid #ddae4e; background: #3b3d5c; margin-bottom: 15px; border-radius: 6px; overflow: hidden; }
+        .group-header { background: #4a4c6e; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .group-body { padding: 10px; display: none; }
+        .group-body.show { display: block; }
+        .slot-item { background: #2f314a; padding: 8px; margin-bottom: 5px; border-radius: 4px; border: 1px solid #555; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Pricing */
+        .cat-section { margin-bottom: 20px; border: 1px solid #555; border-radius: 8px; padding: 10px; position: relative; }
+        .cat-label { position: absolute; top: -10px; left: 10px; background: #1a1c29; padding: 0 5px; color: #aaa; font-size: 0.8rem; font-weight: bold; }
+        .cat-section.cat-a { border-color: #0d6efd; } .cat-section.cat-a .cat-label { color: #0d6efd; }
+        .cat-section.cat-b { border-color: #198754; } .cat-section.cat-b .cat-label { color: #198754; }
+        
+        .item-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; }
+        .form-dark { background: #1a1c29; border: 1px solid #555; color: white; font-size: 0.9rem; }
+        
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #ddae4e; }
     </style>
 </head>
 <body>
 
-<div id="loading"><div class="spinner-border"></div><span class="ms-2">讀取中...</span></div>
+<div id="loading"><div class="spinner-border"></div><div class="mt-2">讀取資料中...</div></div>
 
 <div id="page-audit" class="page-section active">
     <h4 class="text-white mb-3">📅 預約審核</h4>
-    
-    <div class="d-flex justify-content-between align-items-center mb-3 bg-dark p-2 rounded">
+    <div class="d-flex justify-content-between align-items-center mb-3 bg-dark p-2 rounded border border-secondary">
         <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">◀</button>
-        <span id="cal-month-title" class="fw-bold">2026年 1月</span>
+        <span id="cal-month-title" class="fw-bold"></span>
         <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">▶</button>
     </div>
-
-    <div class="cal-grid mb-3">
-        <div class="text-center small text-muted">日</div><div class="text-center small text-muted">一</div>
-        <div class="text-center small text-muted">二</div><div class="text-center small text-muted">三</div>
-        <div class="text-center small text-muted">四</div><div class="text-center small text-muted">五</div>
-        <div class="text-center small text-muted">六</div>
-        <div id="calendar-body" style="display: contents;"></div>
+    
+    <div class="cal-grid mb-4">
+        <div class="text-center small text-muted">日</div><div class="text-center small text-muted">一</div><div class="text-center small text-muted">二</div>
+        <div class="text-center small text-muted">三</div><div class="text-center small text-muted">四</div><div class="text-center small text-muted">五</div><div class="text-center small text-muted">六</div>
+        <div id="calendar-body" style="display:contents"></div>
     </div>
 
-    <div id="pending-list-area">
-        <p class="text-muted text-center small mt-4">請點擊有 <span class="badge bg-danger rounded-circle">N</span> 的日期進行審核</p>
-    </div>
+    <h5 class="text-warning border-bottom pb-2 mb-3">📋 待核准訂單列表 (依下單順序)</h5>
+    <div id="full-pending-list"></div>
 </div>
 
 <div id="page-pricing" class="page-section">
-    <h4 class="text-white mb-3">💰 服務與優惠活動</h4>
+    <h4 class="text-white mb-3">💰 服務與定價</h4>
     
     <div class="card-dark">
-        <div class="card-title-custom">🔥 分離式冷氣・多台優惠</div>
-        <div class="row g-2 align-items-end">
-            <div class="col-4">
-                <label class="small text-muted">2台總價</label>
-                <input type="number" id="bundle-2" class="form-control form-dark text-center">
-            </div>
-            <div class="col-4">
-                <label class="small text-muted">3台總價</label>
-                <input type="number" id="bundle-3" class="form-control form-dark text-center">
-            </div>
-            <div class="col-4">
-                <label class="small text-muted">4台+每台</label>
-                <input type="number" id="bundle-add" class="form-control form-dark text-center">
-            </div>
+        <div class="section-title">🔥 分離式冷氣・多台優惠</div>
+        <div class="row g-2">
+            <div class="col-4"><label class="small text-muted">2台總價</label><input type="number" id="bundle-2" class="form-control form-dark text-center"></div>
+            <div class="col-4"><label class="small text-muted">3台總價</label><input type="number" id="bundle-3" class="form-control form-dark text-center"></div>
+            <div class="col-4"><label class="small text-muted">4台+每台</label><input type="number" id="bundle-add" class="form-control form-dark text-center"></div>
         </div>
     </div>
 
     <div class="card-dark">
-        <div class="card-title-custom">
-            <span>📋 服務項目管理</span>
-            <button class="btn btn-sm btn-success" onclick="addNewItem()">＋ 新增</button>
+        <div class="section-title">
+            <span>🛠️ 項目管理</span>
+            <button class="btn btn-sm btn-success" onclick="addNewItem()">+ 新增</button>
         </div>
         
-        <div class="d-flex small text-muted px-1 mb-1">
-            <span style="flex:2">名稱/類別</span>
-            <span style="flex:1; text-align:center">定價</span>
-            <span style="width:50px; text-align:center">折%</span>
-            <span style="width:30px"></span>
+        <div class="cat-section cat-a">
+            <span class="cat-label">A 類 (冷氣/洗衣機)ㄑ</span>
+            <div id="container-a"></div>
+        </div>
+        
+        <div class="cat-section cat-b">
+            <span class="cat-label">B 類 (居家/清潔)</span>
+            <div id="container-b"></div>
         </div>
 
-        <div id="items-container">
-            </div>
-
-        <div class="mt-3 pt-3 border-top border-secondary">
-            <button class="btn btn-warning w-100 fw-bold" onclick="saveAllSettings()">💾 儲存所有設定</button>
-        </div>
+        <button class="btn btn-warning w-100 fw-bold mt-2" onclick="saveAllSettings()">💾 儲存所有設定</button>
     </div>
 </div>
 
 <div id="page-ads" class="page-section">
     <h4 class="text-white mb-3">🖼️ 廣告圖片</h4>
     <div class="card-dark">
-        <div class="card-title-custom">首頁廣告 Banner</div>
+        <div class="section-title">首頁 Banner 設定</div>
         <img id="preview-img" src="" class="w-100 rounded mb-3" style="min-height: 150px; background: #000; object-fit: cover;">
         
-        <label class="small text-muted mb-1">圖片連結 (URL)</label>
-        <div class="input-group">
-            <input type="text" id="ads-url" class="form-control form-dark" placeholder="請輸入圖片網址...">
-            <button class="btn btn-secondary" onclick="previewAd()">預覽</button>
-        </div>
-        <div class="small text-muted mt-2">
-            * 建議上傳至 Imgur 或 Google Drive 公開連結後貼上。
-        </div>
-        <button class="btn btn-warning w-100 fw-bold mt-3" onclick="saveAllSettings()">💾 儲存設定</button>
+        <label class="btn btn-outline-warning w-100 mb-3">
+            📤 點擊上傳新圖片
+            <input type="file" accept="image/*" hidden onchange="handleImageUpload(this)">
+        </label>
+        
+        <div class="small text-muted mb-2">或手動輸入連結:</div>
+        <input type="text" id="ads-url" class="form-control form-dark mb-3" placeholder="https://...">
+        
+        <button class="btn btn-warning w-100 fw-bold" onclick="saveAllSettings()">💾 儲存設定</button>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchPage('audit', this)">
-        <span class="nav-icon">📅</span> 審核預約
-    </button>
-    <button class="nav-btn" onclick="switchPage('pricing', this)">
-        <span class="nav-icon">🏷️</span> 金額/活動
-    </button>
-    <button class="nav-btn" onclick="switchPage('ads', this)">
-        <span class="nav-icon">🖼️</span> 廣告圖片
-    </button>
+    <button class="nav-btn active" onclick="switchPage('audit', this)"><span class="nav-icon">📅</span>審核預約</button>
+    <button class="nav-btn" onclick="switchPage('pricing', this)"><span class="nav-icon">🏷️</span>金額/活動</button>
+    <button class="nav-btn" onclick="switchPage('ads', this)"><span class="nav-icon">🖼️</span>廣告圖片</button>
 </nav>
 
 <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title text-warning">訂單詳情 (A-O欄)</h5>
+        <div class="modal-content bg-dark border-secondary text-light">
+            <div class="modal-header border-secondary py-2">
+                <h6 class="modal-title text-warning">訂單詳情</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-body small" id="modal-body"></div>
             <div class="modal-footer border-secondary p-1">
-                <button class="btn btn-danger w-100 mb-2" id="btn-reject">❌ 全部拒絕</button>
-                <button class="btn btn-success w-100" id="btn-approve">✅ 核准此時段</button>
+                <button class="btn btn-danger w-50" id="btn-reject">全部拒絕</button>
+                <button class="btn btn-success w-50" id="btn-approve">核准此順位</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ================= 設定區 =================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxyX2xD-t1k0bG5Rz6695__JdOnHc9FW9e8ufwUGvhJwfyhTP9H7DSTjSzY6iwhSKJjhQ/exec"; 
-    // =========================================
-
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbw1df2c6I0iW8mlbIifeUT-VZ7469RpIpuwellN87iy8NrYfBJfZJY7G8ce5W_3D7ye/exec"; 
+    
     let globalConfig = { items: [], promo: {}, bundle: {} };
-    let pendingMap = {};
+    let pendingList = []; // 完整待核准清單
     let viewDate = new Date();
+    let newImageBase64 = null; // 暫存上傳圖片
 
-    window.onload = async () => {
-        await initData();
-    };
+    window.onload = async () => { await initData(); };
 
     function switchPage(pid, btn) {
-        document.querySelectorAll('.page-section').forEach(e => e.classList.remove('active'));
-        document.getElementById('page-' + pid).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.page-section').forEach(e=>e.classList.remove('active'));
+        document.getElementById('page-'+pid).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
         btn.classList.add('active');
     }
 
     async function initData() {
-        showLoading(true);
+        document.getElementById('loading').style.display='flex';
         try {
-            let res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData' }) }).then(r => r.json());
+            let res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'getAdminData'})}).then(r=>r.json());
             globalConfig = res.config;
-            pendingMap = res.pendingMap;
+            pendingList = res.pendingList;
             
-            // 填入資料
             renderPricing();
             renderAds();
             renderCalendar();
-            
+            renderFullPendingList(); // 新增：渲染完整清單
         } catch(e) { Swal.fire('Error', e.toString(), 'error'); } 
-        finally { showLoading(false); }
+        finally { document.getElementById('loading').style.display='none'; }
     }
 
-    // --- 價格與活動邏輯 ---
-    function renderPricing() {
-        // Bundle
-        document.getElementById('bundle-2').value = globalConfig.bundle.ac_2 || 0;
-        document.getElementById('bundle-3').value = globalConfig.bundle.ac_3 || 0;
-        document.getElementById('bundle-add').value = globalConfig.bundle.ac_add || 0;
-
-        // Items
-        const con = document.getElementById('items-container');
-        con.innerHTML = '';
-        if(!globalConfig.items) globalConfig.items = [];
-        
-        globalConfig.items.forEach(item => {
-            con.appendChild(createItemEl(item));
-        });
-    }
-
-    function createItemEl(item) {
-        let div = document.createElement('div');
-        div.className = 'item-row';
-        div.innerHTML = `
-            <div style="flex:2">
-                <input type="text" class="form-control form-dark form-control-sm mb-1 inp-name" value="${item.name}" placeholder="名稱">
-                <select class="form-select form-dark form-select-sm inp-cat" style="width:100px">
-                    <option value="A" ${item.cat==='A'?'selected':''}>A類 (家電)</option>
-                    <option value="B" ${item.cat==='B'?'selected':''}>B類 (清潔)</option>
-                </select>
-            </div>
-            <div style="flex:1; text-align:center;">
-                <input type="number" class="form-control form-dark form-control-sm inp-price" value="${item.price}" oninput="calcPrice(this)">
-                <div class="text-warning small mt-1 final-price">$${Math.round(item.price * (item.off/100))}</div>
-            </div>
-            <div style="width:50px;">
-                <input type="number" class="form-control form-dark form-control-sm inp-off" value="${item.off}" oninput="calcPrice(this)">
-            </div>
-            <div style="width:30px; text-align:right;">
-                <span class="text-danger" style="cursor:pointer; font-size:1.2rem;" onclick="this.parentElement.parentElement.remove()">×</span>
-            </div>
-        `;
-        return div;
-    }
-
-    function addNewItem() {
-        let newItem = { id: 'new_'+Date.now(), name: '', price: 0, off: 100, cat: 'A' };
-        document.getElementById('items-container').appendChild(createItemEl(newItem));
-    }
-
-    function calcPrice(el) {
-        let row = el.closest('.item-row');
-        let p = parseInt(row.querySelector('.inp-price').value) || 0;
-        let off = parseInt(row.querySelector('.inp-off').value) || 100;
-        row.querySelector('.final-price').innerText = '$' + Math.round(p * (off/100));
-    }
-
-    // --- 廣告邏輯 ---
-    function renderAds() {
-        let url = globalConfig.promo.imgUrl || '';
-        document.getElementById('ads-url').value = url;
-        document.getElementById('preview-img').src = url;
-    }
-    function previewAd() {
-        document.getElementById('preview-img').src = document.getElementById('ads-url').value;
-    }
-
-    // --- 儲存所有設定 ---
-    async function saveAllSettings() {
-        showLoading(true);
-        // Collect Bundle
-        globalConfig.bundle = {
-            ac_2: parseInt(document.getElementById('bundle-2').value),
-            ac_3: parseInt(document.getElementById('bundle-3').value),
-            ac_add: parseInt(document.getElementById('bundle-add').value)
-        };
-        // Collect Ads
-        globalConfig.promo.imgUrl = document.getElementById('ads-url').value;
-        // Collect Items
-        let newItems = [];
-        document.querySelectorAll('.item-row').forEach(row => {
-            newItems.push({
-                id: 'itm_' + Math.random().toString(36).substr(2,5), // 簡單生成ID
-                name: row.querySelector('.inp-name').value,
-                price: parseInt(row.querySelector('.inp-price').value) || 0,
-                off: parseInt(row.querySelector('.inp-off').value) || 100,
-                cat: row.querySelector('.inp-cat').value
-            });
-        });
-        globalConfig.items = newItems;
-
-        try {
-            await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    action: 'saveSettings', 
-                    promo: globalConfig.promo, 
-                    items: globalConfig.items, 
-                    bundle: globalConfig.bundle 
-                })
-            });
-            Swal.fire('成功', '所有設定已更新', 'success');
-        } catch(e) { Swal.fire('失敗', '儲存失敗', 'error'); }
-        finally { showLoading(false); }
-    }
-
-    // --- 日曆與審核邏輯 ---
-    function changeMonth(d) {
-        viewDate.setMonth(viewDate.getMonth() + d);
-        renderCalendar();
-    }
-
+    // --- 1. 日曆與清單邏輯 ---
+    function changeMonth(d) { viewDate.setMonth(viewDate.getMonth()+d); renderCalendar(); }
+    
     function renderCalendar() {
         let year = viewDate.getFullYear(), month = viewDate.getMonth();
         document.getElementById('cal-month-title').innerText = `${year}年 ${month+1}月`;
@@ -311,93 +190,250 @@
         let daysInMonth = new Date(year, month+1, 0).getDate();
         
         let html = '';
-        for(let i=0; i<firstDay; i++) html += `<div class="cal-cell" style="opacity:0.3; border:none;"></div>`;
+        for(let i=0; i<firstDay; i++) html += `<div class="cal-cell" style="opacity:0.3;border:none"></div>`;
+        
         for(let i=1; i<=daysInMonth; i++) {
             let dStr = `${year}-${(month+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
-            let count = pendingMap[dStr] || 0;
-            let cls = count > 0 ? 'cal-cell has-pending' : 'cal-cell';
-            let badge = count > 0 ? `<div class="pending-badge">${count}</div>` : '';
-            html += `<div class="${cls}" onclick="loadPendingOrders('${dStr}')">
-                        <span class="text-white">${i}</span>${badge}
+            // 篩選當天的待核准訂單
+            let dayOrders = pendingList.filter(o => o.date === dStr);
+            let tagHtml = '';
+            
+            if(dayOrders.length > 0) {
+                // 去重複顯示地區
+                let regions = [...new Set(dayOrders.map(o => `${o.city}<br>${o.district}`))];
+                tagHtml = regions.slice(0, 2).map(r => `<div class="region-tag">${r}</div>`).join('');
+                if(regions.length > 2) tagHtml += `<div class="region-tag">...</div>`;
+            }
+            
+            html += `<div class="cal-cell ${dayOrders.length>0?'':'text-muted'}" onclick="filterList('${dStr}')">
+                        <span class="cal-date-num">${i}</span>
+                        ${tagHtml}
                      </div>`;
         }
         document.getElementById('calendar-body').innerHTML = html;
-        document.getElementById('pending-list-area').innerHTML = '<p class="text-muted text-center small mt-4">請點擊紅點日期</p>';
     }
 
-    async function loadPendingOrders(date) {
-        if(!pendingMap[date]) return;
-        showLoading(true);
-        try {
-            let res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPendingOrders', date: date }) }).then(r=>r.json());
-            let html = `<h5 class="text-warning border-bottom pb-2">📅 ${date} 待核准清單</h5>`;
-            
-            res.orders.forEach(o => {
-                html += `
-                <div class="order-card">
-                    <div class="d-flex justify-content-between">
-                        <span class="badge bg-primary">順位${o.priority}</span>
-                        <span class="text-white fw-bold">${o.time}</span>
+    function renderFullPendingList(filterDate = null) {
+        let container = document.getElementById('full-pending-list');
+        container.innerHTML = '';
+        
+        // 1. 過濾 (若有指定日期)
+        let list = filterDate ? pendingList.filter(o => o.date === filterDate) : pendingList;
+        
+        if(list.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-3">尚無待核准訂單</div>';
+            return;
+        }
+
+        // 2. 分組 (Group by OrderId)
+        let groups = {};
+        list.forEach(o => {
+            if(!groups[o.orderId]) groups[o.orderId] = { info: o, slots: [] };
+            groups[o.orderId].slots.push(o);
+        });
+
+        // 3. 排序 (依下單時間)
+        let sortedGroupKeys = Object.keys(groups).sort((a,b) => groups[a].info.timestamp.localeCompare(groups[b].info.timestamp));
+
+        // 4. 渲染
+        sortedGroupKeys.forEach(oid => {
+            let g = groups[oid];
+            let info = g.info;
+            let slotsHtml = g.slots.map(s => `
+                <div class="slot-item">
+                    <div>
+                        <span class="badge bg-primary me-2">順位${s.priority}</span>
+                        <span class="text-white fw-bold">${s.date} ${s.time}</span>
                     </div>
-                    <div class="text-white mt-1">${o.name} <span class="text-muted small">(${o.phone})</span></div>
-                    <div class="text-muted small text-truncate">${o.items}</div>
-                    <button class="btn btn-sm btn-light w-100 mt-2" onclick='showDetail(${JSON.stringify(o)})'>查看詳情 / 審核</button>
-                </div>`;
-            });
-            document.getElementById('pending-list-area').innerHTML = html;
-        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
-        finally { showLoading(false); }
+                    <button class="btn btn-sm btn-outline-light" onclick='openModal(${JSON.stringify(s)})'>審核</button>
+                </div>
+            `).join('');
+
+            let html = `
+                <div class="order-group">
+                    <div class="group-header" onclick="this.nextElementSibling.classList.toggle('show')">
+                        <div>
+                            <div class="fw-bold text-white">${info.name} <small class="text-muted">(${info.phone})</small></div>
+                            <div class="small text-warning">${info.city}${info.district} • $${info.totalPrice}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted">${info.timestamp}</div>
+                            <small class="text-info">▼ 展開 ${g.slots.length} 時段</small>
+                        </div>
+                    </div>
+                    <div class="group-body ${filterDate?'show':''}">${slotsHtml}</div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
     }
 
-    function showDetail(o) {
-        let photoBtn = o.photoUrl ? `<a href="${o.photoUrl}" target="_blank" class="btn btn-outline-info btn-sm w-100 mt-2">查看照片 (Drive)</a>` : '';
-        let html = `
-            <ul class="list-group list-group-flush bg-dark text-white">
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">訂單編號：</span> ${o.orderId}</li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">預約時間：</span> ${o.date} ${o.time}</li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">客戶姓名：</span> ${o.name}</li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">電話：</span> <a href="tel:${o.phone}">${o.phone}</a></li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">地址：</span> ${o.address}</li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">項目：</span> ${o.items}</li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">總金額：</span> <span class="text-warning fw-bold">$${o.totalPrice}</span></li>
-                <li class="list-group-item bg-dark text-white"><span class="text-muted">備註：</span> ${o.remarks}</li>
+    function filterList(dateStr) {
+        // 點擊日曆時，過濾下方列表
+        renderFullPendingList(dateStr);
+        // 滾動到列表
+        document.getElementById('full-pending-list').scrollIntoView({behavior:'smooth'});
+    }
+
+    // --- 2. 審核 Modal ---
+    function openModal(o) {
+        let photoBtn = o.photoUrl && o.photoUrl.startsWith('http') ? `<a href="${o.photoUrl}" target="_blank" class="btn btn-outline-info btn-sm w-100 mt-2">查看照片 (Drive)</a>` : '';
+        document.getElementById('modal-body').innerHTML = `
+            <ul class="list-unstyled mb-0">
+                <li><span class="text-muted">訂單：</span>${o.orderId}</li>
+                <li><span class="text-muted">預約：</span><span class="text-white fw-bold">${o.date} ${o.time}</span> (順位${o.priority})</li>
+                <li><span class="text-muted">客戶：</span>${o.name} / <a href="tel:${o.phone}">${o.phone}</a></li>
+                <li><span class="text-muted">地址：</span>${o.address}</li>
+                <li><span class="text-muted">項目：</span>${o.items}</li>
+                <li><span class="text-muted">備註：</span>${o.remarks}</li>
             </ul>
             ${photoBtn}
         `;
-        document.getElementById('modal-body').innerHTML = html;
-        
-        document.getElementById('btn-approve').onclick = () => submitAudit(o, 'approve');
-        document.getElementById('btn-reject').onclick = () => submitAudit(o, 'reject_all');
-        
+        document.getElementById('btn-approve').onclick = () => doAudit(o, 'approve');
+        document.getElementById('btn-reject').onclick = () => doAudit(o, 'reject_all');
         new bootstrap.Modal(document.getElementById('detailModal')).show();
     }
 
-    async function submitAudit(o, action) {
-        if(!confirm(action==='approve'?'確定核准此時段？其他順位將自動拒絕。':'確定拒絕此訂單？')) return;
-        
+    async function doAudit(o, action) {
+        if(!confirm(action==='approve'?'確定核准此時段？':'確定拒絕此訂單？')) return;
         bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();
-        showLoading(true);
-        
+        document.getElementById('loading').style.display='flex';
         try {
             let res = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'adminApproval',
-                    orderId: o.orderId, date: o.date, time: o.time, rowIndex: o.rowIndex,
-                    action: 'adminApproval', action: action // fix key
-                })
+                method:'POST',
+                body:JSON.stringify({ action:'adminApproval', orderId:o.orderId, date:o.date, time:o.time, actionType:action, rowIndex:o.rowIndex, action:action })
             }).then(r=>r.json());
-            
-            if(res.status === 'success') {
-                Swal.fire('完成', res.msg, 'success').then(()=>initData());
-            } else {
-                Swal.fire('失敗', res.msg, 'error');
-            }
-        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
-        finally { showLoading(false); }
+            if(res.status==='success') {
+                Swal.fire('成功',res.msg,'success').then(()=>initData());
+            } else Swal.fire('失敗',res.msg,'error');
+        } catch(e) { Swal.fire('Error',e,'error'); }
+        finally { document.getElementById('loading').style.display='none'; }
     }
 
-    function showLoading(b) { document.getElementById('loading').style.display = b ? 'flex' : 'none'; }
+    // --- 3. 圖片上傳邏輯 ---
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                newImageBase64 = e.target.result; // 存起來，按下儲存時才送出
+                document.getElementById('preview-img').src = newImageBase64;
+                Swal.fire({toast:true, icon:'success', title:'圖片已選取，請記得按「儲存設定」', position:'top'});
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function renderAds() {
+        let url = globalConfig.promo.imgUrl || "";
+        document.getElementById('ads-url').value = url;
+        document.getElementById('preview-img').src = url;
+    }
+
+    // --- 4. 價格 A/B 分流邏輯 ---
+    function renderPricing() {
+        document.getElementById('bundle-2').value = globalConfig.bundle.ac_2 || 0;
+        document.getElementById('bundle-3').value = globalConfig.bundle.ac_3 || 0;
+        document.getElementById('bundle-add').value = globalConfig.bundle.ac_add || 0;
+        
+        let conA = document.getElementById('container-a');
+        let conB = document.getElementById('container-b');
+        conA.innerHTML = ''; conB.innerHTML = '';
+        
+        (globalConfig.items||[]).forEach(item => {
+            let html = createItemHtml(item);
+            if(item.cat === 'A') conA.insertAdjacentHTML('beforeend', html);
+            else conB.insertAdjacentHTML('beforeend', html);
+        });
+    }
+    
+    function createItemHtml(item) {
+        // 為了簡單，這裡將物件轉成 string 存在 dataset，或直接讀取 DOM
+        // 這裡簡化為直接生成 HTML
+        return `
+        <div class="item-row" data-id="${item.id}">
+            <input type="hidden" class="inp-cat" value="${item.cat}">
+            <div style="flex:2">
+                <input type="text" class="form-control form-dark form-control-sm inp-name" value="${item.name}">
+            </div>
+            <div style="flex:1;text-align:center">
+                <input type="number" class="form-control form-dark form-control-sm inp-price" value="${item.price}">
+            </div>
+            <div style="width:50px">
+                <input type="number" class="form-control form-dark form-control-sm inp-off" value="${item.off}">
+            </div>
+            <div style="width:20px;text-align:right;cursor:pointer;color:#dc3545" onclick="this.parentElement.remove()">×</div>
+        </div>`;
+    }
+
+    function addNewItem() {
+        // 預設新增到 A，使用者可下拉改 (這裡簡化，直接給個預設 A)
+        // 為了更靈活，我們彈出視窗問使用者要加到 A 還是 B 比較好，或者直接加在 A 區塊底部
+        Swal.fire({
+            title: '選擇類別',
+            showDenyButton: true,
+            confirmButtonText: 'A類 (家電)',
+            denyButtonText: 'B類 (清潔)',
+            confirmButtonColor: '#0d6efd',
+            denyButtonColor: '#198754'
+        }).then((result) => {
+            let cat = 'A';
+            if (result.isDenied) cat = 'B';
+            let newItem = { id:'new_'+Date.now(), name:'', price:0, off:100, cat:cat };
+            let html = createItemHtml(newItem);
+            if(cat==='A') document.getElementById('container-a').insertAdjacentHTML('beforeend', html);
+            else document.getElementById('container-b').insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    async function saveAllSettings() {
+        document.getElementById('loading').style.display='flex';
+        
+        // Bundle
+        globalConfig.bundle = {
+            ac_2: parseInt(document.getElementById('bundle-2').value)||0,
+            ac_3: parseInt(document.getElementById('bundle-3').value)||0,
+            ac_add: parseInt(document.getElementById('bundle-add').value)||0
+        };
+        // Items
+        let items = [];
+        document.querySelectorAll('.item-row').forEach(row => {
+            items.push({
+                id: row.dataset.id || 'new_'+Math.random(),
+                name: row.querySelector('.inp-name').value,
+                price: parseInt(row.querySelector('.inp-price').value)||0,
+                off: parseInt(row.querySelector('.inp-off').value)||100,
+                cat: row.querySelector('.inp-cat').value
+            });
+        });
+        globalConfig.items = items;
+        // Ads (URL input + Image Base64 if exists)
+        globalConfig.promo.imgUrl = document.getElementById('ads-url').value;
+
+        try {
+            let payload = { 
+                action: 'saveSettings', 
+                promo: globalConfig.promo, 
+                items: globalConfig.items, 
+                bundle: globalConfig.bundle 
+            };
+            // 如果有新圖片，放入 payload
+            if(newImageBase64) {
+                payload.promoImageBase64 = newImageBase64;
+            }
+
+            let res = await fetch(GAS_URL, { method:'POST', body:JSON.stringify(payload) }).then(r=>r.json());
+            
+            if(res.status==='success') {
+                if(res.newImgUrl) {
+                    document.getElementById('ads-url').value = res.newImgUrl;
+                    newImageBase64 = null; // 清空暫存
+                }
+                Swal.fire('成功', '設定已儲存', 'success');
+            } else Swal.fire('失敗', res.msg, 'error');
+            
+        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+        finally { document.getElementById('loading').style.display='none'; }
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
