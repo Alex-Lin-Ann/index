@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>勝潔實-居家清潔預約系統</title>
+    <title>勝潔實-居家清潔預約</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -23,8 +23,8 @@
         .nav-tabs .nav-link { color: #ccc; }
         .nav-tabs .nav-link.active { background-color: #3b3d5c; color: #ddae4e; border-color: #555 #555 #3b3d5c; font-weight: bold; border-bottom: 2px solid #ddae4e; }
         .service-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #4a4c6e; border-bottom: 1px solid #555; margin-bottom: 5px; border-radius: 5px; }
-        .service-row strong { color: #fff; }
-        .service-row small { color: #ccc !important; }
+        .service-row strong { color: #fff; font-size: 1.05rem; }
+        .service-price { color: #ddae4e; font-weight: bold; }
         .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ddae4e; background: transparent; color: #ddae4e; font-weight: bold; }
         .qty-input { width: 35px; text-align: center; border: none; background: transparent; font-weight: bold; color: #fff; }
         
@@ -46,12 +46,10 @@
         .cal-cell.disabled { background-color: #2a2c42; color: #555; cursor: not-allowed; border-color: #333; }
         
         .cal-date { font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; }
-        
-        /* ★ 新增：依身分別區分顏色 */
         .cal-badge { font-size: 0.6rem; padding: 1px 2px; border-radius: 3px; width: 96%; text-align: center; line-height: 1.1; margin-bottom: 1px; color: #fff; }
-        .badge-a { background-color: #0d6efd; /* Blue for A */ }
-        .badge-b { background-color: #198754; /* Green for B */ }
-        .badge-c { background-color: #fd7e14; /* Orange for C */ }
+        .badge-a { background-color: #0d6efd; }
+        .badge-b { background-color: #198754; }
+        .badge-c { background-color: #fd7e14; }
         
         .cal-tag-recommend { position: absolute; top: -5px; left: -5px; background: #ff3333; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); z-index: 10; border: 2px solid #fff; animation: popIn 0.3s ease-out; }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
@@ -62,7 +60,7 @@
         .slot-btn.active .rank-badge { display: block; }
         
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #2f314a; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000; border-top: 1px solid #444; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; color: #fff; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; }
         
         .form-control, .form-select { background-color: #4a4c6e; border: 1px solid #555; color: #fff; }
         .form-control:focus, .form-select:focus { background-color: #55577a; color: #fff; border-color: #ddae4e; box-shadow: 0 0 0 0.25rem rgba(221, 174, 78, 0.25); }
@@ -91,11 +89,11 @@
 </head>
 <body>
 
-<div id="loading-overlay"><div class="spinner-border text-gold"></div><div class="mt-2">處理中...</div></div>
+<div id="loading-overlay"><div class="spinner-border text-gold"></div><div class="mt-2" id="loading-text">載入設定中...</div></div>
 
 <div id="promo-overlay">
     <div id="promo-content">
-        <img src="https://i.ibb.co/pBsf5s7f/promotion.jpg" alt="優惠活動">
+        <img id="promo-img" src="" alt="優惠活動">
     </div>
 </div>
 
@@ -121,10 +119,8 @@
     <div id="step2" class="step-section">
         <div class="card shadow-sm"><div class="card-body p-2">
             <h5>2. 服務項目</h5>
-            <div class="alert alert-secondary small py-2 mb-3" style="background-color: #3b3d5c; color: #ccc; border: 1px solid #555;">
-                ❄️ 分離式冷氣優惠：<br>
-                1台 $2000 | 2台 $3000 | 3台 $4500<br>
-                4台以上每加1台 +$1500
+            <div id="promo-text-box" class="alert alert-secondary small py-2 mb-3" style="background-color: #3b3d5c; color: #ccc; border: 1px solid #555;">
+                ❄️ 載入優惠資訊中...
             </div>
             <ul class="nav nav-tabs nav-fill mb-3" id="myTab" role="tablist">
                 <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#content-a">A. 冷氣/洗衣機</button></li>
@@ -210,20 +206,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ================= 設定區 =================
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxlcdpdB3SyC0pKNdFLGEsE3JFsjNCRm7F4xyuIhbXlT8IzcOeY2ByzyuD4P3hXnB3vRA/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzwXRLclX1Vgq31D642_u5JuaBZKP_IL5xpuM4fIRT-RmPfG_y2oi1cAOO7BNFpqsJ1Qw/exec"; 
     const LIFF_ID = "2008811649-QZq68T5c"; 
     // =========================================
+
+    // 全域變數 - 存放從後端抓來的設定
+    let globalConfig = { items: [], promo: {}, bundle: {} };
 
     const CITY_DATA = {
         "台北市": ["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"],
         "新北市": ["板橋區","三重區","中和區","永和區","新莊區","新店區","土城區","蘆洲區","樹林區","汐止區","鶯歌區","三峽區","淡水區","瑞芳區","五股區","泰山區","林口區","深坑區","石碇區","坪林區","三芝區","石門區","八里區","平溪區","雙溪區","貢寮區","金山區","萬里區","烏來區"],
         "桃園市": ["桃園區","中壢區","大溪區","楊梅區","蘆竹區","大園區","龜山區","八德區","龍潭區","平鎮區","新屋區","觀音區","復興區"],
         "其他縣市": []
-    };
-
-    const CATALOG = { 
-        'A': { 'ac_split':{n:'分離式冷氣',t:60,p:2000}, 'ac_window':{n:'窗型冷氣',t:120,p:3500}, 'ac_hidden':{n:'吊隱式冷氣',t:120,p:3000}, 'ac_4way':{n:'四方吹冷氣',t:150,p:4500}, 'wash_top':{n:'直立洗衣機',t:90,p:1500}, 'wash_drum':{n:'滾筒洗衣機',t:180,p:3500} },
-        'B': { 'bath':{n:'浴室鍍膜(間)',t:210,p:4500}, 'bed_1':{n:'洗床(單人)',t:180,p:1500}, 'bed_2':{n:'洗床(雙人)',t:180,p:2500}, 'sofa_1':{n:'洗沙發(單人)',t:120,p:1500}, 'sofa_2':{n:'洗沙發(雙人)',t:120,p:2000}, 'sofa_all':{n:'洗沙發(全組)',t:120,p:3500}, 'mite_home':{n:'居家除塵蟎(間)',t:60,p:2000}, 'mite_sofa_1':{n:'除蟎-沙發(單)',t:60,p:600}, 'mite_sofa_2':{n:'除蟎-沙發(雙)',t:60,p:1000}, 'mite_sofa_l':{n:'除蟎-沙發(L型)',t:60,p:1500}, 'mite_bed_1':{n:'除蟎-床(單)',t:60,p:600}, 'mite_bed_2':{n:'除蟎-床(雙)',t:60,p:1200} }
     };
 
     let currentStep = 1;
@@ -235,7 +229,10 @@
 
     window.onload = async () => {
         initCitySelect();
-        renderMenu('A','content-a'); renderMenu('B','content-b');
+        
+        // ★ 核心修改：啟動時先抓取後台設定
+        await fetchUserSettings();
+
         try { 
             await liff.init({liffId:LIFF_ID}); 
             if(liff.isLoggedIn()){ 
@@ -243,8 +240,78 @@
                 document.getElementById('user-name').value=userProfile.displayName; 
             } else liff.login(); 
         } catch(e){ console.log("LIFF Error:", e); }
+        
         loadMonthSchedule(); 
     };
+
+    // ★ 新增：從 GAS 抓取設定
+    async function fetchUserSettings() {
+        document.getElementById('loading-overlay').style.display='flex';
+        try {
+            let res = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getUserSettings' })
+            }).then(r => r.json());
+            
+            if(res.config) {
+                globalConfig = res.config;
+                // 渲染選單
+                renderDynamicMenu();
+                // 顯示優惠文字
+                updateBundleText();
+                // 準備廣告圖
+                if(globalConfig.promo && globalConfig.promo.imgUrl) {
+                    document.getElementById('promo-img').src = globalConfig.promo.imgUrl;
+                }
+            }
+        } catch(e) {
+            console.error("Config Load Error", e);
+            Swal.fire('載入錯誤', '無法讀取價目表，請稍後再試', 'error');
+        } finally {
+            document.getElementById('loading-overlay').style.display='none';
+        }
+    }
+
+    function updateBundleText() {
+        let b = globalConfig.bundle || {};
+        let html = `❄️ 分離式冷氣優惠：<br>
+                    2台 $${b.ac_2||0} | 3台 $${b.ac_3||0} | 4台以上每加1台 +$${b.ac_add||0}`;
+        document.getElementById('promo-text-box').innerHTML = html;
+    }
+
+    // ★ 修改：動態渲染選單
+    function renderDynamicMenu() {
+        let conA = document.getElementById('content-a');
+        let conB = document.getElementById('content-b');
+        conA.innerHTML = ''; conB.innerHTML = '';
+
+        if(!globalConfig.items) return;
+
+        globalConfig.items.forEach(item => {
+            // 計算折扣後價格
+            let finalPrice = Math.round(item.price * (item.off / 100));
+            // 顯示價格字串 (如果有打折顯示原價刪除線)
+            let priceHtml = item.off < 100 
+                ? `<small class="text-muted text-decoration-line-through me-1">$${item.price}</small> <span class="service-price">$${finalPrice}</span>`
+                : `<span class="service-price">$${item.price}</span>`;
+
+            let html = `
+                <div class="service-row">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        ${priceHtml}
+                    </div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="chQty('${item.id}', '${item.cat}', -1)">-</button>
+                        <input id="qty-${item.id}" class="qty-input" value="0" readonly>
+                        <button class="qty-btn" onclick="chQty('${item.id}', '${item.cat}', 1)">+</button>
+                    </div>
+                </div>`;
+            
+            if(item.cat === 'A') conA.insertAdjacentHTML('beforeend', html);
+            else conB.insertAdjacentHTML('beforeend', html);
+        });
+    }
 
     function initCitySelect() {
         const citySelect = document.getElementById('city-select');
@@ -277,49 +344,71 @@
         }
     }
 
-    function renderMenu(type,id){
-        let h=''; 
-        for(let k in CATALOG[type]){
-            let i=CATALOG[type][k];
-            h+=`<div class="service-row"><div><strong>${i.n}</strong><br><small class="text-muted">$${i.p}</small></div><div class="qty-control"><button class="qty-btn" onclick="chQty('${k}','${type}',-1)">-</button><input id="qty-${k}" class="qty-input" value="0" readonly><button class="qty-btn" onclick="chQty('${k}','${type}',1)">+</button></div></div>`;
-        }
-        document.getElementById(id).innerHTML=h;
-    }
-    
-    function chQty(k,type,d){
-        let el=document.getElementById(`qty-${k}`), v=parseInt(el.value)+d;
-        if(v<0)v=0; el.value=v; order.items[k]=v;
-        let p=0, timeA=0, timeB=0;
-        let splitAcCount = order.items['ac_split'] || 0;
-        let splitAcPrice = 0;
-        if (splitAcCount === 1) splitAcPrice = 2000;
-        else if (splitAcCount >= 2) splitAcPrice = splitAcCount * 1500; 
+    // ★ 修改：動態計算總價 (包含 Bundle 邏輯)
+    function chQty(id, type, d) {
+        let el = document.getElementById(`qty-${id}`);
+        if(!el) return; // 防呆
+        let v = parseInt(el.value) + d;
+        if(v < 0) v = 0;
+        el.value = v;
+        order.items[id] = v; // 記錄數量
 
-        for(let key in order.items){
-            let qty = order.items[key];
-            if(qty>0){
-                if (key === 'ac_split') {
-                    p += splitAcPrice;
-                    timeA += CATALOG.A[key].t * qty;
-                } else {
-                    if(CATALOG.A[key]){ p+=CATALOG.A[key].p*qty; timeA+=CATALOG.A[key].t*qty; }
-                    else if(CATALOG.B[key]){ p+=CATALOG.B[key].p*qty; timeB+=CATALOG.B[key].t*qty; }
-                }
-            }
-        }
-        order.totalPrice=p;
-        order.totalTime = Math.max(timeA, timeB); 
-        document.getElementById('total-price').innerText=p;
-        document.getElementById('total-time').innerText=order.totalTime;
-
+        recalcTotal();
+        
+        // 提醒
         let totalCount = 0;
-        for (let key in order.items) {
-            totalCount += (order.items[key] || 0); 
-        }
-
+        for (let k in order.items) totalCount += order.items[k];
         if (totalCount >= 5 && d > 0) { 
              Swal.fire({ toast: true, position: 'top', icon: 'info', title: '件數較多提醒', text: '建議您直接與師傅聯絡，或繼續預約由師傅為您安排。', timer: 3000, showConfirmButton: false });
         }
+    }
+
+    function recalcTotal() {
+        let p = 0;
+        let timeA = 0, timeB = 0; // 這邊暫時簡化工時計算，因為 Catalog 變動態了，如果需要精準工時，需要在 items 設定裡加 time 欄位。目前先以數量估算或忽略工時顯示。
+        
+        // 1. 先找出所有已選項目
+        let cartItems = [];
+        globalConfig.items.forEach(item => {
+            if(order.items[item.id] > 0) {
+                cartItems.push({ ...item, qty: order.items[item.id] });
+            }
+        });
+
+        // 2. 處理「分離式冷氣」Bundle
+        // 假設名稱包含 "分離式冷氣" 的項目適用 Bundle
+        let splitAcItem = cartItems.find(x => x.name.includes('分離式冷氣'));
+        let otherItems = cartItems.filter(x => !x.name.includes('分離式冷氣'));
+
+        // 計算 Bundle 價格
+        if(splitAcItem) {
+            let count = splitAcItem.qty;
+            let bundlePrice = 0;
+            let b = globalConfig.bundle || {};
+            // 預設單價 (從該項目自身價格抓)
+            let basePrice = Math.round(splitAcItem.price * (splitAcItem.off/100));
+
+            if(count === 1) bundlePrice = basePrice;
+            else if(count === 2) bundlePrice = b.ac_2 || (basePrice * 2);
+            else if(count === 3) bundlePrice = b.ac_3 || (basePrice * 3);
+            else if(count >= 4) {
+                bundlePrice = (b.ac_3 || (basePrice * 3)) + ((count - 3) * (b.ac_add || basePrice));
+            }
+            p += bundlePrice;
+        }
+
+        // 計算其他項目
+        otherItems.forEach(x => {
+            let final = Math.round(x.price * (x.off / 100));
+            p += final * x.qty;
+        });
+
+        order.totalPrice = p;
+        document.getElementById('total-price').innerText = p;
+        
+        // 工時估算 (假設 A類 60分, B類 120分 做為粗略估計，若要精準需後台新增工時設定)
+        // 這裡暫時維持 0 或隱藏，以免誤導
+        // document.getElementById('total-time').innerText = ...; 
     }
 
     function handleFiles(fs){ 
@@ -358,7 +447,6 @@
         .catch(e=>document.getElementById('calendar-body').innerHTML='<div class="text-danger p-3" style="grid-column:1/-1">載入失敗</div>');
     }
 
-    // ★ 修改：渲染日曆 (支援 A,B,C 顏色顯示)
     function renderCalendarGrid(year, month, busyMap){
         let html = '', firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
         let today = new Date(); today.setHours(0,0,0,0);
@@ -371,29 +459,21 @@
             let d = new Date(year, month, i);
             let dateStr = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
             
-            // 後端回傳格式: { regions: [{name: "新北市泰山區", type: "A"}, ...], hasSlot: true/false }
             let data = busyMap[dateStr] || { regions: [], hasSlot: true }; 
             let regions = data.regions;
             let hasSlot = data.hasSlot;
 
-            // ★ 修改：Badge 顯示與顏色
-            // region 是物件 {name, type}
             let badgeHtml = regions.map(r => {
                 let badgeClass = '';
                 if (r.type === 'A') badgeClass = 'badge-a';
                 else if (r.type === 'B') badgeClass = 'badge-b';
                 else if (r.type === 'C') badgeClass = 'badge-c';
-                
-                // 斷行處理 (新北市<br>泰山區)
                 let displayName = r.name.replace(/(..[縣市])/, '$1<br>');
-                
                 return `<div class="cal-badge ${badgeClass}">${displayName}</div>`;
             }).join('');
             
-            // 推薦邏輯
             let recommendTag = '';
             if (d >= today && regions.length > 0 && hasSlot && userCity && userCity !== '其他縣市') {
-                // 檢查是否有任一行程開頭符合使用者縣市
                 let isMatch = regions.some(r => r.name.startsWith(userCity));
                 if (isMatch) {
                     recommendTag = `<div class="cal-tag-recommend">推</div>`;
@@ -433,7 +513,6 @@
                 h+=`<div class="col-6"><button class="slot-btn ${active}" onclick="toggleSlot('${dateStr}','${s.time}',this)">${s.label}<span class="rank-badge">${rank}</span></button></div>`;
             });
             document.getElementById('slots-container').innerHTML = h;
-            // 這裡後端回傳 timeA, timeB, timeC，前端暫時只需存起來供參考，實際計算由後端處理
         });
     }
 
@@ -448,7 +527,6 @@
             
             let isRec = false;
             let userCity = document.getElementById('city-select').value;
-            // ★ 修改：檢查 regions 結構 (現在是物件陣列)
             if (currentBusyMap && currentBusyMap[d] && currentBusyMap[d].regions && userCity && userCity !== '其他縣市') {
                 if (currentBusyMap[d].regions.some(r => r.name.startsWith(userCity))) {
                     isRec = true;
@@ -474,7 +552,7 @@
         if(d===1){
             if(currentStep===1 && !document.getElementById('district-select').value) return Swal.fire('請選地區');
             
-            if(currentStep===1 && !hasShownPromo) {
+            if(currentStep===1 && !hasShownPromo && globalConfig.promo && globalConfig.promo.imgUrl) {
                 document.getElementById('promo-overlay').style.display = 'flex';
                 hasShownPromo = true;
                 setTimeout(() => { document.getElementById('promo-overlay').style.display = 'none'; }, 3000);
@@ -485,7 +563,14 @@
             if(currentStep===4){
                 if(order.slots.length !== 3) return Swal.fire('請選擇 3 個時段', '為了方便安排，請務必選擇 3 個時段才能繼續喔！', 'warning');
                 updateAddrPrefix(); 
-                document.getElementById('final-item-list').innerText = Object.keys(order.items).filter(k=>order.items[k]>0).map(k=>(CATALOG.A[k]||CATALOG.B[k]).n+'x'+order.items[k]).join(', ');
+                
+                // 動態產生訂單摘要
+                let summaryList = [];
+                globalConfig.items.forEach(item => {
+                    if(order.items[item.id] > 0) summaryList.push(`${item.name}x${order.items[item.id]}`);
+                });
+                document.getElementById('final-item-list').innerText = summaryList.join(', ');
+                
                 document.getElementById('final-price').innerText = order.totalPrice;
                 document.getElementById('final-slot-list').innerHTML = order.slots.map((s,i)=>`<li>順位${i+1}: ${s.date} ${s.time}</li>`).join('');
             }
@@ -510,6 +595,8 @@
         if(!n||!p||!a) return Swal.fire('請填完整資料');
         
         document.getElementById('loading-overlay').style.display='flex';
+        document.getElementById('loading-text').innerText = '訂單提交中...';
+        
         fetch(GAS_URL, {
             method:'POST',
             body:JSON.stringify({
@@ -535,5 +622,3 @@
 </script>
 </body>
 </html>
-
-
