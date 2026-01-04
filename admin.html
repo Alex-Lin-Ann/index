@@ -149,7 +149,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzwXRLclX1Vgq31D642_u5JuaBZKP_IL5xpuM4fIRT-RmPfG_y2oi1cAOO7BNFpqsJ1Qw/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbw1FAQf9setokq4Uv3xnC-eGiIQ9O-wlkdzfv2qT888VoDfbneXWl6HboPRM8AX46InJA/exec"; 
     
     let globalConfig = { items: [], promo: {}, bundle: {} };
     let pendingList = []; // 完整待核准清單
@@ -347,19 +347,25 @@
     }
     
     function createItemHtml(item) {
-        // 為了簡單，這裡將物件轉成 string 存在 dataset，或直接讀取 DOM
-        // 這裡簡化為直接生成 HTML
+        // ★ 修改：增加 [工時] 欄位
         return `
         <div class="item-row" data-id="${item.id}">
             <input type="hidden" class="inp-cat" value="${item.cat}">
+            
             <div style="flex:2">
-                <input type="text" class="form-control form-dark form-control-sm inp-name" value="${item.name}">
+                <input type="text" class="form-control form-dark form-control-sm inp-name" value="${item.name}" placeholder="項目名稱">
             </div>
+            
+            <div style="width:70px; text-align:center">
+                <input type="number" class="form-control form-dark form-control-sm inp-time" value="${item.time || 60}" placeholder="分">
+                <div style="font-size:0.6rem; color:#aaa">工時(分)</div>
+            </div>
+
             <div style="flex:1;text-align:center">
-                <input type="number" class="form-control form-dark form-control-sm inp-price" value="${item.price}">
+                <input type="number" class="form-control form-dark form-control-sm inp-price" value="${item.price}" placeholder="$">
             </div>
             <div style="width:50px">
-                <input type="number" class="form-control form-dark form-control-sm inp-off" value="${item.off}">
+                <input type="number" class="form-control form-dark form-control-sm inp-off" value="${item.off}" placeholder="%">
             </div>
             <div style="width:20px;text-align:right;cursor:pointer;color:#dc3545" onclick="this.parentElement.remove()">×</div>
         </div>`;
@@ -402,7 +408,8 @@
                 name: row.querySelector('.inp-name').value,
                 price: parseInt(row.querySelector('.inp-price').value)||0,
                 off: parseInt(row.querySelector('.inp-off').value)||100,
-                cat: row.querySelector('.inp-cat').value
+                cat: row.querySelector('.inp-cat').value,
+                time: parseInt(row.querySelector('.inp-time').value) || 60 // ★ 儲存工時
             });
         });
         globalConfig.items = items;
